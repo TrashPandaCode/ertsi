@@ -86,10 +86,6 @@ print("Preparing to measure RT60 with sample rate", sample_rate, "Hz and duratio
 # Run the measurement
 ir, rt60_values = measure_rt60(sample_rate, duration)
 
-
-pf.plot.time(ir)
-
-
 print(rt60_values)
 ir = pf.Signal(ir, sampling_rate=sample_rate)
 pf.plot.time(ir)
