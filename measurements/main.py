@@ -59,8 +59,10 @@ def main():
 
     print_device_names()
 
+    room_name = input("Enter the room name: ")
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    folder = f"recordings/{timestamp}"
+    folder = f"recordings/{room_name}/{timestamp}"
     os.makedirs(folder, exist_ok=True)
 
     sweep, recorded = record_rir(fs, sweep_duration, silence_duration)
