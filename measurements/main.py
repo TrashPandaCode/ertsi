@@ -1,93 +1,107 @@
-
 import numpy as np
-import matplotlib.pyplot as plt
 import sounddevice as sd
-import pyfar as pf
-import time
+import scipy.signal as signal
+import matplotlib.pyplot as plt
 import pyroomacoustics as pra
+from scipy.io import wavfile
+import csv
+from datetime import datetime
+import os
 
-def measure_rt60(sample_rate=48000, duration=3):
+def print_device_names():    
+    input_device = sd.query_devices(sd.default.device[0])['name']
+    output_device = sd.query_devices(sd.default.device[1])['name']
+    
+    print(f"\nSelected Microphone: {input_device}")
+    print(f"Selected Speaker: {output_device}\n")
 
-    print("Preparing measurement...")
-    
-    # Create exponential sine sweep
-    f_start = 20  # Hz
-    f_stop = 20000  # Hz
-    sweep_samples = int(duration * sample_rate)
-    
-    # Using pyfar to generate the sweep
-    sweep = pf.signals.exponential_sweep_freq(
-        n_samples=sweep_samples,
-        frequency_range=[f_start, f_stop],
-        sampling_rate=sample_rate,
-        start_margin=5000,
-        stop_margin=1000,
-    )
-    
-    # # Apply fade-in and fade-out to avoid clicks
-    # fade_samples = int(0.01 * sample_rate)  # 10 ms fade
-    # fade_in = np.linspace(0, 1, fade_samples)
-    # fade_out = np.linspace(1, 0, fade_samples)
-    
-    # sweep_signal = sweep.time.copy()
-    # sweep_signal[:fade_samples] *= fade_in
-    # sweep_signal[-fade_samples:] *= fade_out
-    
-    # Normalize to avoid clipping
-    # sweep_signal = 0.9 * sweep / np.max(np.abs(sweep))
-    
-    silence = pf.Signal(
-        np.zeros(int(sample_rate * 2)),  # 2 seconds of silence
-        sampling_rate=sample_rate,
-    )
-    playback_signal = np.append(sweep.time, silence.time)
-    playback_signal = pf.Signal(
-        playback_signal,
-        sampling_rate=sample_rate,
-    )
+def generate_sweep(duration=5, fs=48000, f_start=20, f_end=20000):
+    t = np.linspace(0, duration, int(fs * duration))
+    sweep = signal.chirp(t, f0=f_start, f1=f_end, t1=duration, method='logarithmic')
+    sweep *= np.hanning(len(sweep))
+    return sweep
 
-    # Add silence at the end to capture full reverb tail
-    # silence_duration = 2  # seconds
-    # silence_samples = int(silence_duration * sample_rate)
-    # playback_signal = np.concatenate([sweep, np.zeros(silence_samples)])
+def record_rir(fs=48000, sweep_duration=5, silence_duration=1):
+    sweep = generate_sweep(duration=sweep_duration, fs=fs)
+    sweep = np.concatenate([np.zeros(int(fs * silence_duration)), sweep, np.zeros(int(fs * silence_duration))])
 
+    print("Starting playback and recording...")
+    recording = sd.playrec(sweep, samplerate=fs, channels=1, dtype='float32')
+    sd.wait()
+    print("Recording finished.")
     
-    # Prepare for playback and recording
-    print("Starting measurement. Please ensure the room is quiet...")
-    time.sleep(1)
-    
-    # Perform the measurement
-    recorded_signal = sd.playrec(
-        playback_signal.time.T,
-        sample_rate,
-        channels=1,
-        blocking=True
-    ).flatten()
-    
-    print("Measurement completed. Processing data...")
-    
-    #remove the first 3 seconds of the recorded signal to avoid the initial transient
-    recorded_signal = recorded_signal[3 * sample_rate:]
+    return sweep, recording[:,0]
 
-    # Calculate RT60 using Schroeder integration method
-    rt60_values = pra.experimental.rt60.measure_rt60(
-        recorded_signal,
-        sample_rate,
-        plot=True,
-    )
-    
-    return recorded_signal, rt60_values
+def deconvolve(recorded, original):
+    n = len(recorded) + len(original) - 1
+    recorded_fft = np.fft.fft(recorded, n=n)
+    original_fft = np.fft.fft(original, n=n)
+    H = recorded_fft / (original_fft + 1e-10) # no division by zero
+    ir = np.fft.ifft(H)
+    ir = np.real(ir)
+    return ir
 
+def save_wav(filename, data, fs):
+    data_normalized = data / np.max(np.abs(data))
+    wavfile.write(filename, fs, (data_normalized * 32767).astype(np.int16))
 
-sample_rate = 48000
-duration = 3
-print("Preparing to measure RT60 with sample rate", sample_rate, "Hz and duration", duration, "s.")
+def save_rt60s(filename, rt60s):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Frequency (Hz)', 'RT60 (s)'])
+        for freq, rt60 in rt60s.items():
+            writer.writerow([freq, rt60])
 
-# Run the measurement
-ir, rt60_values = measure_rt60(sample_rate, duration)
+def main():
+    fs = 48000
+    sweep_duration = 5
+    silence_duration = 2
 
-print(rt60_values)
-ir = pf.Signal(ir, sampling_rate=sample_rate)
-pf.plot.time(ir)
+    print_device_names()
 
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    folder = f"recordings/{timestamp}"
+    os.makedirs(folder, exist_ok=True)
 
+    sweep, recorded = record_rir(fs, sweep_duration, silence_duration)
+    ir = deconvolve(recorded, sweep)
+
+    # t_ir = np.arange(len(ir)) / fs
+    # plt.figure(figsize=(10, 4))
+    # plt.plot(t_ir, ir)
+    # plt.title("Measured Room Impulse Response")
+    # plt.xlabel("Time [s]")
+    # plt.ylabel("Amplitude")
+    # plt.grid()
+    # plt.show()
+
+    recorded_filename = os.path.join(folder, f"recorded_{timestamp}.wav")
+    save_wav(recorded_filename, recorded, fs)
+    ir_filename = os.path.join(folder, f"impulse_response_{timestamp}.wav")
+    save_wav(ir_filename, ir, fs)
+    print(f"Impulse response saved as '{ir_filename}'")
+
+    bands = [125, 250, 500, 1000, 2000, 4000, 8000]
+    band_rt60s = {}
+
+    for center_freq in bands:
+        sos = signal.butter(4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], btype='band', fs=fs, output='sos')
+        filtered_ir = signal.sosfilt(sos, ir)
+        rt60_band = pra.experimental.measure_rt60(filtered_ir, fs, plot=True)
+        band_rt60s[center_freq] = rt60_band
+        
+        plot_filename = os.path.join(folder, f"energy_decay_{center_freq}Hz_{timestamp}.svg")
+        plt.title(f"Energy Decay - {center_freq} Hz")
+        plt.savefig(plot_filename, format="svg")
+        plt.close()
+
+    rt60_filename = os.path.join(folder, f"rt60_data_{timestamp}.csv")
+    save_rt60s(rt60_filename, band_rt60s)
+    print(f"RT60 data saved as '{rt60_filename}'")
+
+    print("RT60s per band:")
+    for cf, rt in band_rt60s.items():
+        print(f"{cf} Hz: {rt:.2f} s")
+
+if __name__ == "__main__":
+    main()

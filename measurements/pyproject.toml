@@ -5,8 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "datetime>=5.5",
     "ipykernel>=6.29.5",
-    "pyfar>=0.7.2",
+    "matplotlib>=3.10.1",
+    "numpy>=2.2.5",
     "pyroomacoustics>=0.8.3",
+    "scipy>=1.15.2",
     "sounddevice>=0.5.1",
 ]
