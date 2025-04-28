@@ -33,12 +33,17 @@ def record_rir(fs=48000, sweep_duration=5, silence_duration=1):
     return sweep, recording[:,0]
 
 def deconvolve(recorded, original):
-    n = len(recorded) + len(original) - 1
-    recorded_fft = np.fft.fft(recorded, n=n)
-    original_fft = np.fft.fft(original, n=n)
-    H = recorded_fft / (original_fft + 1e-10) # no division by zero
-    ir = np.fft.ifft(H)
-    ir = np.real(ir)
+    # Cross-correlate the original sweep with the recorded signal
+    correlation = signal.correlate(recorded, original, mode='full')
+    
+    # Find the index of the maximum correlation
+    delay = correlation.argmax() - (len(original) - 1)
+    
+    # The impulse response is the portion of the correlation that starts at the peak
+    ir = correlation[delay:]
+    
+    # Normalize the impulse response
+    ir = ir / np.max(np.abs(ir))  # Normalize to avoid clipping
     return ir
 
 def save_wav(filename, data, fs):
@@ -67,6 +72,8 @@ def main():
 
     sweep, recorded = record_rir(fs, sweep_duration, silence_duration)
     ir = deconvolve(recorded, sweep)
+    ir = ir / np.max(np.abs(ir))
+    ir = ir[int(0.1 * fs):]
 
     # t_ir = np.arange(len(ir)) / fs
     # plt.figure(figsize=(10, 4))
