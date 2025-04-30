@@ -90,7 +90,7 @@ def main():
     plt.close()
 
     save_wav(os.path.join(folder, f"impulse_response_{timestamp}.wav"), ir.time.T, fs)
-    save_wav(os.path.join(folder, f"impulse_response_processed_{timestamp}.wav"), ir.time.T, fs)
+    save_wav(os.path.join(folder, f"impulse_response_processed_{timestamp}.wav"), ir_processed.time.T, fs)
 
 
     bands = [125, 250, 500, 1000, 2000, 4000, 8000]
