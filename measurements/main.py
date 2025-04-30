@@ -93,13 +93,12 @@ def main():
     save_wav(os.path.join(folder, f"impulse_response_processed_{timestamp}.wav"), ir_processed.time.T, fs)
 
 
-    bands = [125, 250, 500, 1000, 2000, 4000, 8000]
+    bands = [50, 63, 80, 100, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000]
     band_rt60s = {}
 
     for center_freq in bands:
-        sos = signal.butter(4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], btype='band', fs=fs, output='sos')        
-        filtered_ir = signal.sosfilt(sos, ir_processed.time.T)
-        rt60_band = pra.experimental.measure_rt60(filtered_ir, fs, plot=True)
+        filtered_ir = pf.dsp.filter.butterworth(ir_processed, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
+        rt60_band = pra.experimental.measure_rt60(filtered_ir.time.T, fs, plot=True)
         band_rt60s[center_freq] = rt60_band
 
         plot_filename = os.path.join(folder, f"energy_decay_{center_freq}Hz_{timestamp}.svg")
