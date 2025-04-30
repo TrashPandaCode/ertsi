@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 
 def print_device_names():    
-    input_device = sd.query_devices(sd.default.device[0])['name']
+    input_device = sd.query_devices(sd.default.device[1])['name']
     output_device = sd.query_devices(sd.default.device[1])['name']
     
     print(f"\nSelected Microphone: {input_device}")

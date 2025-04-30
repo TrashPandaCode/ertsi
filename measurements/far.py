@@ -11,7 +11,7 @@ import pyfar as pf
 
 
 def print_device_names():
-    input_device = sd.query_devices(sd.default.device[0])['name']
+    input_device = sd.query_devices(sd.default.device[1])['name']
     output_device = sd.query_devices(sd.default.device[1])['name']
 
     print(f"\nSelected Microphone: {input_device}")
@@ -28,10 +28,11 @@ def record_rir(fs=48000, sweep_duration=5, silence_duration=1):
 
     print("Starting playback and recording...")
     recording = sd.playrec(sweep.time.T, samplerate=fs,
-                           channels=2, blocking=True)
+                           channels=1, blocking=True)
+    print(recording.shape)
     print("Recording finished.")
 
-    return recording
+    return recording, sweep
 
 def save_wav(filename, data, fs):
     data_normalized = data / np.max(np.abs(data))
@@ -59,7 +60,7 @@ def main():
     folder = f"recordings/{room_name}/{timestamp}"
     os.makedirs(folder, exist_ok=True)
 
-    recording = record_rir(fs, sweep_duration, silence_duration)
+    recording, sweep = record_rir(fs, sweep_duration, silence_duration)
 
     rec_signal = pf.Signal(recording[:, 0].T, fs)
     save_wav(os.path.join(
@@ -72,7 +73,7 @@ def main():
     plt.savefig(os.path.join(
         folder, f"recorded_signal_{timestamp}.svg"), format="svg")
 
-    reference = pf.Signal(recording[:, 1].T, fs)
+    reference = sweep
     inverted = pf.dsp.regularized_spectrum_inversion(reference, (20, 20000))
     ir = rec_signal * inverted
 
@@ -86,6 +87,7 @@ def main():
     ax[0].set_title("Impulse Response")
     plt.savefig(os.path.join(
         folder, f"impulse_response_{timestamp}.svg"), format="svg")
+    plt.close()
 
     save_wav(os.path.join(folder, f"impulse_response_{timestamp}.wav"), ir.time.T, fs)
     save_wav(os.path.join(folder, f"impulse_response_processed_{timestamp}.wav"), ir.time.T, fs)
