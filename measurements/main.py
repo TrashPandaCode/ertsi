@@ -65,7 +65,7 @@ def main():
     rec_signal = pf.Signal(recording[:, 0].T, fs)
     save_wav(os.path.join(
         folder, f"recording_{timestamp}.wav"), rec_signal.time.T, fs)
-    
+
     print(rec_signal)
 
     ax = pf.plot.time_freq(rec_signal)
@@ -78,11 +78,11 @@ def main():
     ir = rec_signal * inverted
 
     ir_processed = pf.dsp.filter.butterworth(ir, 8, 40, 'highpass')
-    ir_processed = pf.dsp.time_window(ir_processed, [0, .01, 0.5, 0.6], unit='s', crop='window') # adjust window if needed
+    ir_processed = pf.dsp.time_window(ir_processed, [0, .01, .5, .8], unit='s', crop='window') # adjust window if needed
 
     ax = pf.plot.time_freq(ir, dB_time=True, color=[.6, .6, .6], label='raw')
     pf.plot.time_freq(ir_processed, dB_time=True, label='post-processed')
-    ax[0].set_xlim(0, .75) # adjust if needed
+    ax[0].set_xlim(0, 2) # adjust if needed
     ax[1].legend(loc='lower left')
     ax[0].set_title("Impulse Response")
     plt.savefig(os.path.join(
