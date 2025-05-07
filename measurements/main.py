@@ -78,11 +78,11 @@ def main():
     ir = rec_signal * inverted
 
     ir_processed = pf.dsp.filter.butterworth(ir, 8, 40, 'highpass')
-    ir_processed = pf.dsp.time_window(ir_processed, [0, .01, 0.5, 0.6], unit='s', crop='window') # adjust window if needed
+    ir_processed = pf.dsp.time_window(ir_processed, [0, .01, 0.9, 1], unit='s', crop='window') # adjust window if needed
 
     ax = pf.plot.time_freq(ir, dB_time=True, color=[.6, .6, .6], label='raw')
     pf.plot.time_freq(ir_processed, dB_time=True, label='post-processed')
-    ax[0].set_xlim(0, .75) # adjust if needed
+    ax[0].set_xlim(0, 1.5) # adjust if needed
     ax[1].legend(loc='lower left')
     ax[0].set_title("Impulse Response")
     plt.savefig(os.path.join(
