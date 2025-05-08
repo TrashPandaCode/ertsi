@@ -6,7 +6,7 @@ import csv
 from datetime import datetime
 import os
 import pyfar as pf
-import pyrato as ra
+# import pyrato as ra
 
 
 def print_device_names():
