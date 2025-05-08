@@ -63,8 +63,6 @@ def main():
                 save_rt60s(rt60_filename, band_rt60s)
                 print(f"RT60 data saved as '{rt60_filename}'")
 
-                exit()
-
 
 if __name__ == "__main__":
     main()

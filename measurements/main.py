@@ -8,6 +8,7 @@ import csv
 from datetime import datetime
 import os
 import pyfar as pf
+import pyrato as ra
 
 
 def print_device_names():
@@ -33,6 +34,7 @@ def record_rir(fs=48000, sweep_duration=5, silence_duration=1):
     print("Recording finished.")
 
     return recording, sweep
+
 
 def save_wav(filename, data, fs):
     data_normalized = data / np.max(np.abs(data))
@@ -65,7 +67,7 @@ def main():
     rec_signal = pf.Signal(recording[:, 0].T, fs)
     save_wav(os.path.join(
         folder, f"recording_{timestamp}.wav"), rec_signal.time.T, fs)
-    
+
     print(rec_signal)
 
     ax = pf.plot.time_freq(rec_signal)
@@ -78,33 +80,35 @@ def main():
     ir = rec_signal * inverted
 
     ir_processed = pf.dsp.filter.butterworth(ir, 8, 40, 'highpass')
-    ir_processed = pf.dsp.time_window(ir_processed, [0, .01, 0.9, 1], unit='s', crop='window') # adjust window if needed
+    ir_processed = pf.dsp.time_window(
+        ir_processed, [0, .01, 3, 3.1], unit='s', crop='window')
 
     ax = pf.plot.time_freq(ir, dB_time=True, color=[.6, .6, .6], label='raw')
     pf.plot.time_freq(ir_processed, dB_time=True, label='post-processed')
-    ax[0].set_xlim(0, 1.5) # adjust if needed
+    ax[0].set_xlim(0, 1.5)  # adjust if needed
     ax[1].legend(loc='lower left')
     ax[0].set_title("Impulse Response")
     plt.savefig(os.path.join(
         folder, f"impulse_response_{timestamp}.svg"), format="svg")
     plt.close()
 
-    save_wav(os.path.join(folder, f"impulse_response_{timestamp}.wav"), ir.time.T, fs)
-    save_wav(os.path.join(folder, f"impulse_response_processed_{timestamp}.wav"), ir_processed.time.T, fs)
+    save_wav(os.path.join(
+        folder, f"impulse_response_{timestamp}.wav"), ir.time.T, fs)
+    save_wav(os.path.join(
+        folder, f"impulse_response_processed_{timestamp}.wav"), ir_processed.time.T, fs)
 
-
-    bands = [50, 63, 80, 100, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000]
+    bands = [50, 63, 80, 100, 125, 250, 500,
+             1000, 2000, 4000, 8000, 12000, 16000]
     band_rt60s = {}
 
     for center_freq in bands:
-        filtered_ir = pf.dsp.filter.butterworth(ir_processed, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
-        rt60_band = pra.experimental.measure_rt60(filtered_ir.time.T, fs, plot=True)
-        band_rt60s[center_freq] = rt60_band
+        ir_filtered = pf.dsp.filter.butterworth(
+            ir_processed, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
+        edc = ra.energy_decay_curve_chu_lundeby(
+            ir_filtered, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
 
-        plot_filename = os.path.join(folder, f"energy_decay_{center_freq}Hz_{timestamp}.svg")
-        plt.title(f"Energy Decay - {center_freq} Hz")
-        plt.savefig(plot_filename, format="svg")
-        plt.close()
+        band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
+            edc, T="T60")[0]
 
     rt60_filename = os.path.join(folder, f"rt60_data_{timestamp}.csv")
     save_rt60s(rt60_filename, band_rt60s)
