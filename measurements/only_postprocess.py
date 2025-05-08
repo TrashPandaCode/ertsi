@@ -1,11 +1,5 @@
 import numpy as np
-import sounddevice as sd
-import scipy.signal as signal
-import matplotlib.pyplot as plt
-import pyroomacoustics as pra
-from scipy.io import wavfile
 import csv
-from datetime import datetime
 import os
 import pyfar as pf
 import pyrato as ra
