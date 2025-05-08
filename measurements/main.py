@@ -78,8 +78,6 @@ def main():
     ir = rec_signal * inverted
 
     ir_processed = pf.dsp.filter.butterworth(ir, 8, 40, 'highpass')
-    ir_processed = pf.dsp.time_window(
-        ir_processed, [0, .01, 3, 3.1], unit='s', crop='window')
 
     ax = pf.plot.time_freq(ir, dB_time=True, color=[.6, .6, .6], label='raw')
     pf.plot.time_freq(ir_processed, dB_time=True, label='post-processed')
@@ -92,8 +90,6 @@ def main():
 
     save_wav(os.path.join(
         folder, f"impulse_response_{timestamp}.wav"), ir.time.T, fs)
-    save_wav(os.path.join(
-        folder, f"impulse_response_processed_{timestamp}.wav"), ir_processed.time.T, fs)
 
     # bands = [50, 63, 80, 100, 125, 250, 500,
     #          1000, 2000, 4000, 8000, 12000, 16000]
