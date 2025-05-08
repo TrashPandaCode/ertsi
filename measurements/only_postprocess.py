@@ -43,25 +43,23 @@ def main():
 
                 ir = pf.io.read_audio(
                     f"{current_path}/impulse_response_{measurement}.wav")
-                ir = pf.dsp.time_window(ir, [0, .01, 1.9, 2], unit='s', crop='window')
+                ir = pf.dsp.time_window(
+                    ir, [0, .01, 3, 3.1], unit='s', crop='window')
 
-
-                # bands = [50, 63, 80, 100, 125, 250, 500,
-                #          1000, 2000, 4000, 8000, 12000, 16000]
-                pf.plot.time(ir, dB=True)
-                plt.show()
-
-                bands = [4000]
+                bands = [50, 63, 80, 100, 125, 250, 500,
+                         1000, 2000, 4000, 8000, 12000, 16000]
                 band_rt60s = {}
 
                 for center_freq in bands:
+                    ir = pf.dsp.filter.butterworth(
+                        ir, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
                     edc = ra.energy_decay_curve_chu_lundeby(
-                        ir, is_energy=False, freq=center_freq, plot=True, time_shift=True, normalize=True)
-                    plt.show()
-                    band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
-                        edc, T="T60")
+                        ir, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
 
-                rt60_filename = f"{current_path}/rt60s_data_{measurement}.csv"
+                    band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
+                        edc, T="T60")[0]
+
+                rt60_filename = f"{current_path}/rt60_data_{measurement}.csv"
                 save_rt60s(rt60_filename, band_rt60s)
                 print(f"RT60 data saved as '{rt60_filename}'")
 
