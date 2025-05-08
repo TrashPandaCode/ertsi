@@ -95,26 +95,26 @@ def main():
     save_wav(os.path.join(
         folder, f"impulse_response_processed_{timestamp}.wav"), ir_processed.time.T, fs)
 
-    bands = [50, 63, 80, 100, 125, 250, 500,
-             1000, 2000, 4000, 8000, 12000, 16000]
-    band_rt60s = {}
+    # bands = [50, 63, 80, 100, 125, 250, 500,
+    #          1000, 2000, 4000, 8000, 12000, 16000]
+    # band_rt60s = {}
 
-    for center_freq in bands:
-        ir_filtered = pf.dsp.filter.butterworth(
-            ir_processed, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
-        edc = ra.energy_decay_curve_chu_lundeby(
-            ir_filtered, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
+    # for center_freq in bands:
+    #     ir_filtered = pf.dsp.filter.butterworth(
+    #         ir_processed, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
+    #     edc = ra.energy_decay_curve_chu_lundeby(
+    #         ir_filtered, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
 
-        band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
-            edc, T="T60")[0]
+    #     band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
+    #         edc, T="T60")[0]
 
-    rt60_filename = os.path.join(folder, f"rt60_data_{timestamp}.csv")
-    save_rt60s(rt60_filename, band_rt60s)
-    print(f"RT60 data saved as '{rt60_filename}'")
+    # rt60_filename = os.path.join(folder, f"rt60_data_{timestamp}.csv")
+    # save_rt60s(rt60_filename, band_rt60s)
+    # print(f"RT60 data saved as '{rt60_filename}'")
 
-    print("RT60s per band:")
-    for cf, rt in band_rt60s.items():
-        print(f"{cf} Hz: {rt:.2f} s")
+    # print("RT60s per band:")
+    # for cf, rt in band_rt60s.items():
+    #     print(f"{cf} Hz: {rt:.2f} s")
 
 
 if __name__ == "__main__":
