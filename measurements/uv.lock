@@ -451,6 +451,7 @@ dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pyfar" },
+    { name = "pyrato" },
     { name = "pyroomacoustics" },
     { name = "scipy" },
     { name = "sounddevice" },
@@ -463,6 +464,7 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.10.1" },
     { name = "numpy", specifier = ">=2.2.5" },
     { name = "pyfar", specifier = ">=0.7.2" },
+    { name = "pyrato", specifier = ">=0.4.0" },
     { name = "pyroomacoustics", specifier = ">=0.8.3" },
     { name = "scipy", specifier = ">=1.15.2" },
     { name = "sounddevice", specifier = ">=0.5.1" },
@@ -698,6 +700,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bb/22/f1129e69d94ffff626bdb5c835506b3a5b4f3d070f17ea295e12c2c6f60f/pyparsing-3.2.3.tar.gz", hash = "sha256:b9c13f1ab8b3b542f72e28f634bad4de758ab3ce4546e4301970ad6fa77c38be", size = 1088608, upload_time = "2025-03-25T05:01:28.114Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl", hash = "sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf", size = 111120, upload_time = "2025-03-25T05:01:24.908Z" },
+]
+
+[[package]]
+name = "pyrato"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "pyfar" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6b/fb/70b3526a529ca520a84353f19c0d83c2c5ec62e9dcfe71196f195cd57bac/pyrato-0.4.0.tar.gz", hash = "sha256:98e7931a3775f3daa714c212c0784ad9922c81ca4f8675e8cbe14b0823ce3c3a", size = 4384943, upload_time = "2024-03-20T14:46:28.167Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/2a/f45850c85cf13df3647625022568cbb5af3d0419bd344c23e9cb2a237d0e/pyrato-0.4.0-py2.py3-none-any.whl", hash = "sha256:8ee82c36997634adc26b206f07ce205f3bac203a9c2008c7b8c70c68f16c8a57", size = 19176, upload_time = "2024-03-20T14:46:26.417Z" },
 ]
 
 [[package]]
