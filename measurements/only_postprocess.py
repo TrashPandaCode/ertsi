@@ -3,6 +3,7 @@ import csv
 import os
 import pyfar as pf
 import pyrato as ra
+import matplotlib.pyplot as plt
 
 
 def save_rt60s(filename, rt60s):
@@ -29,7 +30,8 @@ def main():
         for room in dirs:
             # use only last measurement of each room
             room_path = os.path.join(root, room)
-            subdirs = [d for d in os.listdir(room_path) if os.path.isdir(os.path.join(room_path, d))]
+            subdirs = [d for d in os.listdir(
+                room_path) if os.path.isdir(os.path.join(room_path, d))]
             if not subdirs:
                 continue
             measurement = sorted(subdirs)[-1]
@@ -41,19 +43,19 @@ def main():
                 if file.startswith("impulse_response_processed_") and file.endswith(".wav"):
                     os.remove(os.path.join(current_path, file))
 
-            ir = pf.io.read_audio(
+            ir_orig = pf.io.read_audio(
                 f"{current_path}/impulse_response_{measurement}.wav")
-            ir = pf.dsp.time_window(
-                ir, [0, .01, 3, 3.1], unit='s', crop='window')
+            ir_window = pf.dsp.time_window(
+                ir_orig, [0, .01, 3, 3.1], unit='s', crop='window')
 
             bands = [50, 63, 80, 100, 125, 250, 500,
-                        1000, 2000, 4000, 8000, 12000, 16000]
+                     1000, 2000, 4000, 8000, 12000, 16000]
             band_rt60s = {}
 
             try:
                 for center_freq in bands:
                     ir = pf.dsp.filter.butterworth(
-                        ir, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
+                        ir_window, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
                     edc = ra.energy_decay_curve_chu_lundeby(
                         ir, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
 
@@ -65,6 +67,10 @@ def main():
                 print(f"RT60 data saved as '{rt60_filename}'")
             except Exception as e:
                 print(f"Error processing {current_path}: {e}")
+                pf.plot.time_freq(ir_window, dB_time=True)
+                plt.savefig(os.path.join(
+                    current_path, f"impulse_response_{measurement}.svg"), format="svg")
+                plt.close()
                 continue
 
 
