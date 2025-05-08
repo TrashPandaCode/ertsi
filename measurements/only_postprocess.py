@@ -34,7 +34,7 @@ def main():
                 continue
             measurement = sorted(subdirs)[-1]
             current_path = os.path.join(root, room, measurement)
-            
+
             for file in os.listdir(current_path):
                 if file.startswith("energy_decay_") and file.endswith(".svg"):
                     os.remove(os.path.join(current_path, file))
@@ -50,18 +50,22 @@ def main():
                         1000, 2000, 4000, 8000, 12000, 16000]
             band_rt60s = {}
 
-            for center_freq in bands:
-                ir = pf.dsp.filter.butterworth(
-                    ir, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
-                edc = ra.energy_decay_curve_chu_lundeby(
-                    ir, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
+            try:
+                for center_freq in bands:
+                    ir = pf.dsp.filter.butterworth(
+                        ir, 4, [center_freq/np.sqrt(2), center_freq*np.sqrt(2)], 'bandpass')
+                    edc = ra.energy_decay_curve_chu_lundeby(
+                        ir, is_energy=False, freq=center_freq, plot=False, time_shift=True, normalize=True)
 
-                band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
-                    edc, T="T60")[0]
+                    band_rt60s[center_freq] = ra.reverberation_time_energy_decay_curve(
+                        edc, T="T60")[0]
 
-            rt60_filename = f"{current_path}/rt60_data_{measurement}.csv"
-            save_rt60s(rt60_filename, band_rt60s)
-            print(f"RT60 data saved as '{rt60_filename}'")
+                rt60_filename = f"{current_path}/rt60_data_new_{measurement}.csv"
+                save_rt60s(rt60_filename, band_rt60s)
+                print(f"RT60 data saved as '{rt60_filename}'")
+            except Exception as e:
+                print(f"Error processing {current_path}: {e}")
+                continue
 
 
 if __name__ == "__main__":
