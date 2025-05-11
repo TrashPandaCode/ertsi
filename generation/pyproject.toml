@@ -1,0 +1,12 @@
+[project]
+name = "generation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "treble-tsdk",
+]
+
+[tool.uv.sources]
+treble-tsdk = { path = "deps/treble_tsdk-2.0.21-py3-none-any.whl" }
