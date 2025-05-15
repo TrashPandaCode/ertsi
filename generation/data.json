@@ -1,0 +1,10 @@
+{
+    "room_verts": [[0, 0], [0, 6], [4, 6], [4, 0]],
+    "desk_count": 4,
+    "floor_material": "vinyl on concrete",
+    "ceiling_material": "panel",
+    "wall_0_material": "window",
+    "wall_1_material": "smooth painted concrete",
+    "wall_2_material": "smooth painted concrete",
+    "wall_3_material": "smooth painted concrete"
+}
