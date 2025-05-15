@@ -21,11 +21,17 @@ def get_rir(polygons, height=3):
         ceiling="ceiling_perforated_gypsum_board",
     )
 
+    """
+    We can observe that the order 17 is not sufficient when using only the ISM.
+    RT is able to simulate the whole tail.
+    Also, the RT60 of ISM is not completely consistent with the Hybrid method as it
+    doesn't include scattering. Scattering reduces the length of the reverberent tail.
+    """
     room = pra.ShoeBox(
         # pol,
         [4, 6, 3],
         fs=48000,
-        max_order=30,  # this is suggested
+        max_order=30,  # 3 is suggested for ray tracing
         materials=m,
         # ray_tracing=True,
         air_absorption=True,
