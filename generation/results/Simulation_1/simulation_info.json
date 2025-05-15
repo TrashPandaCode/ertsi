@@ -1,0 +1,133 @@
+{
+  "id": "36276580-5214-43ca-bc96-60cce4c07c45",
+  "projectId": "bc91d45c-e9f6-410f-ba72-d0fbfffcb844",
+  "name": "Simulation_1",
+  "description": null,
+  "simulationType": "GA",
+  "impulseLengthSec": 4.347360017457608,
+  "crossoverFrequency": 25,
+  "modelDefinitionId": "61806fa0-8737-42b3-b264-d6795905d373",
+  "originalGeometryLibraryId": null,
+  "onTaskError": "Ignore",
+  "category": "Default",
+  "receivers": [
+    {
+      "id": "f65412d5-4fbe-4225-92e5-8cf02b6f3b64",
+      "receiverType": "Mono",
+      "label": "receiver_1",
+      "x": 3,
+      "y": 5,
+      "z": 1.2,
+      "orderNumber": 0,
+      "receiverProperties": null
+    }
+  ],
+  "sources": [
+    {
+      "id": "3330a9ad-20f9-4005-a84a-5c73f0023a7c",
+      "tasks": [
+        {
+          "id": "436b342e-fdd3-4c81-8c66-03d4f34e7093",
+          "name": "GA_source_1",
+          "taskType": "GA",
+          "status": "Provisioning",
+          "createdAt": "2025-05-15T16:52:26.7548722Z",
+          "startedAt": null,
+          "completedAt": null,
+          "progressPercentage": 0,
+          "statusMessage": null,
+          "taskSubType": "None",
+          "tokensUsed": 0
+        }
+      ],
+      "sourceType": "Omni",
+      "label": "source_1",
+      "x": 0.25,
+      "y": 0.5,
+      "z": 1.5,
+      "orderNumber": 0,
+      "sourceProperties": null
+    }
+  ],
+  "layerMaterialAssignments": [
+    {
+      "materialId": "d48f352e-9abd-4c1d-a761-0cb980e25711",
+      "materialName": "Wood panel with air space behind",
+      "layerId": "ee2c7fac-ec8f-4760-a368-551c5dc559b9",
+      "layerName": "Furniture/Desk",
+      "scatteringCoefficient": null
+    },
+    {
+      "materialId": "ee054f97-9408-4553-a751-f8676fa763d8",
+      "materialName": "Slotted panel, 17% open, 40 mm 81 kg/m3 absorber, 30 mm cavity",
+      "layerId": "d41b6c11-9b13-4761-9eb7-9acb398c0869",
+      "layerName": "polygon_room_ceiling",
+      "scatteringCoefficient": null
+    },
+    {
+      "materialId": "6fa50531-fdaa-4ed7-bc35-e02902e40d7f",
+      "materialName": "Linoleum or vinyl on concrete",
+      "layerId": "cb12728a-0142-47d2-8073-48e9c40f4bc3",
+      "layerName": "polygon_room_floor",
+      "scatteringCoefficient": null
+    },
+    {
+      "materialId": "4988337b-df50-40fe-b833-9d39bb88e9d9",
+      "materialName": "Window glass",
+      "layerId": "6b85f6d2-61f8-4158-a536-34bed4928680",
+      "layerName": "polygon_room_wall_0",
+      "scatteringCoefficient": null
+    },
+    {
+      "materialId": "a8abbe80-d955-461a-8e84-257ff31d47c3",
+      "materialName": "Smooth painted concrete",
+      "layerId": "43a484bd-aa57-4e93-ab67-41ecc9cd1ef9",
+      "layerName": "polygon_room_wall_1",
+      "scatteringCoefficient": null
+    },
+    {
+      "materialId": "a8abbe80-d955-461a-8e84-257ff31d47c3",
+      "materialName": "Smooth painted concrete",
+      "layerId": "762f79e8-21b2-474f-8970-ddc2b3f407bc",
+      "layerName": "polygon_room_wall_2",
+      "scatteringCoefficient": null
+    },
+    {
+      "materialId": "a8abbe80-d955-461a-8e84-257ff31d47c3",
+      "materialName": "Smooth painted concrete",
+      "layerId": "8c3d773c-7bf0-4ecc-b0b0-6eaf485c5ba4",
+      "layerName": "polygon_room_wall_3",
+      "scatteringCoefficient": null
+    }
+  ],
+  "localMeshSizing": [],
+  "simulationSettings": {
+    "speedOfSound": 343,
+    "gaSettings": {
+      "numberOfRays": 50000,
+      "ISMOrder": 2,
+      "isAirAbsorptionActive": true,
+      "ISMRayCount": 500000,
+      "gaSolverType": "IsmPressureRayRadiosity"
+    },
+    "dgSettings": {
+      "polynomialOrder": 4,
+      "disableBcOptimizations": null,
+      "dumpRawIrs": null,
+      "skipPostprocessing": null
+    },
+    "ambisonicsOrder": 2
+  },
+  "energyDecayThreshold": 60,
+  "resultStatus": {
+    "result_code": 0,
+    "result_code_name": "Ok",
+    "message": null
+  },
+  "mesherSettings": null,
+  "metadata": null,
+  "createdAt": "2025-05-15T16:52:17.686588Z",
+  "updatedAt": "2025-05-15T16:52:26.7524734Z",
+  "status": "Completed",
+  "project_id": "bc91d45c-e9f6-410f-ba72-d0fbfffcb844"
+}
