@@ -20,3 +20,5 @@ folder structure:
             -testB
 
 testB images are required even without matching
+
+num_threads > 0 might cause issues on windows
